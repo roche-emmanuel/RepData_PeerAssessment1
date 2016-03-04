@@ -38,16 +38,25 @@ total_steps_per_day <- ddply(data,"date",summarize,total_steps=sum(steps))
 head(total_steps_per_day,10)
 ```
 
-Then we can compute the mean of the total number of steps simply ignoring the NA values:
+Let's now display an histogram of the total number of steps per day:
+
+```{r}
+hist(total_steps_per_day$total_steps,breaks=10, main="Number of steps per day")
+```
+
+Finaly we can compute the mean of the total number of steps simply ignoring the NA values, as well as the median value:
 
 ```{r}
 mean_tot_steps <- mean(total_steps_per_day$total_steps, na.rm = T)
 mean_tot_steps
+med <- median(total_steps_per_day$total_steps, na.rm = T)
+med
 ```
 
-The mean of the total number of steps per day is of about `r format(floor(mean_tot_steps+.5),scientific=F)` steps.
+The mean of the total number of steps per day is of about `r format(floor(mean_tot_steps+.5),scientific=F)` steps, whereas the median value is around `r format(floor(med+.5),scientific=F)`
 
 ## What is the average daily activity pattern?
+
 
 
 

@@ -48,7 +48,16 @@ head(total_steps_per_day,10)
 ## 10 2012-10-10        9900
 ```
 
-Then we can compute the mean of the total number of steps simply ignoring the NA values:
+Let's now display an histogram of the total number of steps per day:
+
+
+```r
+hist(total_steps_per_day$total_steps,breaks=10, main="Number of steps per day")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
+Finaly we can compute the mean of the total number of steps simply ignoring the NA values, as well as the median value:
 
 
 ```r
@@ -60,9 +69,19 @@ mean_tot_steps
 ## [1] 10766.19
 ```
 
-The mean of the total number of steps per day is of about 10766 steps.
+```r
+med <- median(total_steps_per_day$total_steps, na.rm = T)
+med
+```
+
+```
+## [1] 10765
+```
+
+The mean of the total number of steps per day is of about 10766 steps, whereas the median value is around 10765
 
 ## What is the average daily activity pattern?
+
 
 
 
