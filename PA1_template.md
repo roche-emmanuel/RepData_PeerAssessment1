@@ -1,18 +1,12 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-output:
-  html_document:
-    keep_md: yes
-  pdf_document: default
-  word_document: default
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 To load the dataset we first need to extract to source zip file. Note that we only perfom this step if the activity.csv file doesn't exist yet:
 
-```{r}
+
+```r
 if(!file.exists("activity.csv"))
 {
   print("Extracting activity dataset...")
@@ -22,7 +16,8 @@ if(!file.exists("activity.csv"))
 
 Load we can load the dataset and preprocess it. First we will format the date column into POSIXct values:
 
-```{r}
+
+```r
 data <- read.csv("activity.csv")
 data$date <- as.POSIXct(data$date)
 ```
@@ -32,20 +27,40 @@ data$date <- as.POSIXct(data$date)
 To compute the mean total number of steps taken per day we first need to compute the total number of steps for each day.
 This can be achieved with the dplyr and summarise functions:
 
-```{r}
+
+```r
 library(plyr)
 total_steps_per_day <- ddply(data,"date",summarize,total_steps=sum(steps))
 head(total_steps_per_day,10)
 ```
 
+```
+##          date total_steps
+## 1  2012-10-01          NA
+## 2  2012-10-02         126
+## 3  2012-10-03       11352
+## 4  2012-10-04       12116
+## 5  2012-10-05       13294
+## 6  2012-10-06       15420
+## 7  2012-10-07       11015
+## 8  2012-10-08          NA
+## 9  2012-10-09       12811
+## 10 2012-10-10        9900
+```
+
 Then we can compute the mean of the total number of steps simply ignoring the NA values:
 
-```{r}
+
+```r
 mean_tot_steps <- mean(total_steps_per_day$total_steps, na.rm = T)
 mean_tot_steps
 ```
 
-The mean of the total number of steps per day is of about `r format(floor(mean_tot_steps+.5),scientific=F)` steps.
+```
+## [1] 10766.19
+```
+
+The mean of the total number of steps per day is of about 10766 steps.
 
 ## What is the average daily activity pattern?
 
