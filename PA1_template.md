@@ -174,7 +174,7 @@ Lets now fill those missing data in the dataset: for each row where we have an N
 # create a copy of the dataset:
 filled_data <- data
 
-# Fill the missing data we a simple for loop:
+# Fill the missing data with a simple for loop:
 steps <- data$steps
 for(i in seq_along(steps))
 {
@@ -234,3 +234,55 @@ We observe almost the same values for the mean and median values when using this
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+First we prepare a factor to separate the week days from the weed end days:
+
+
+```r
+days <- weekdays(data$date)
+weekends <- days=="Saturday" | days=="Sunday"
+
+# add this vector as a factor in the filled dataset:
+filled_data$weekends <- factor(weekends)
+
+# rename the levels:
+levels(filled_data$weekends) <- c("weekday","weekend")
+```
+
+
+Now we can compute the mean steps for each 5 minutes interval and for each week day type using again the summarize function:
+
+
+```r
+mean_steps_week <- ddply(filled_data,c("interval","weekends"),summarize,mean_steps=mean(steps))
+head(mean_steps_week,10)
+```
+
+```
+##    interval weekends  mean_steps
+## 1         0  weekday 2.251153040
+## 2         0  weekend 0.214622642
+## 3         5  weekday 0.445283019
+## 4         5  weekend 0.042452830
+## 5        10  weekday 0.173165618
+## 6        10  weekend 0.016509434
+## 7        15  weekday 0.197903564
+## 8        15  weekend 0.018867925
+## 9        20  weekday 0.098951782
+## 10       20  weekend 0.009433962
+```
+
+Lets now draw a plot to compare those mean steps patterns:
+
+
+```r
+library(lattice)
+with(mean_steps_week,xyplot(mean_steps~interval|factor(weekends),
+       type='l',layout=c(1,2),
+       xlab='Interval',ylab='Number of Steps'))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)
+
+As we can see from the previous graph the patterns during week days and week ends are a bit different: on the whole it seems the number of steps are more evenly distributed on the complete days during week ends.
+
