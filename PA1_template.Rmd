@@ -25,6 +25,7 @@ Load we can load the dataset and preprocess it. First we will format the date co
 ```{r}
 data <- read.csv("activity.csv")
 data$date <- as.POSIXct(data$date)
+head(data,10)
 ```
 
 ## What is mean total number of steps taken per day?
@@ -57,11 +58,84 @@ The mean of the total number of steps per day is of about `r format(floor(mean_t
 
 ## What is the average daily activity pattern?
 
+To answer this question we start with building the mean number of steps for each 5 minutes chunk:
 
+```{r}
+
+mean_pat <- ddply(data,"interval",summarize,mean_steps=mean(steps, na.rm = T))
+head(mean_pat,10)
+```
+
+Now we can plot this mean steps per day partern, and subsequently compute the maximum mean step value
+
+```{r}
+# Compute the max mean step value and the corresponding interval:
+plot(x=mean_pat$interval,y=mean_pat$mean_steps, type='l',main="Mean steps pattern",
+     xlab="5-Minute intervals", ylab="Mean steps value")
+
+maxi <- max(mean_pat$mean_steps)
+maxint <- mean_pat$interval[mean_pat$mean_steps == maxi]
+
+# compute the corresponding day time:
+hours <- floor(maxint/60.0)
+mins <- maxint - hours*60
+
+daytime <- sprintf("%02d:%02d", hours,mins)
+```
+
+
+As reported in the previous plot the maximum number of mean steps is of `r maxi`, and it is detected here in the interval `r maxint`, which correspond to the day time of `r daytime` (assuming that the interval 0 corresponds to time 00:00).
 
 
 ## Imputing missing values
 
+Let's now compute the number of rows where we have NA values:
+
+```{r}
+
+numna <- sum(is.na(data$steps))
+numna
+
+# compute the proportion of NA:
+prop <- sprintf("%.2f",100.0*numna/dim(data)[1])
+```
+
+In this dataset we have `r numna` NA rows, which represents `r prop`% of the available data.
+
+
+Lets now fill those missing data in the dataset: for each row where we have an NA steps value, we will simply replace this NA value with the mean steps value corresponding to that 5 minutes interval:
+
+```{r}
+
+# create a copy of the dataset:
+filled_data <- data
+
+# Fill the missing data we a simple for loop:
+steps <- data$steps
+for(i in seq_along(steps))
+{
+  if(is.na(steps[i]))
+  {
+    steps[i] <- mean_pat$mean_steps[mean_pat$interval == data$interval[i]]
+  }
+}
+
+filled_data$steps <- steps
+head(filled_data,10)
+```
+
+Now we build a new histogram from the filled dataset:
+
+```{r}
+tot_steps <- ddply(filled_data,"date",summarize,total_steps=sum(steps))
+hist(tot_steps$total_steps,breaks=10, main="Number of steps per day (filled data)")
+tot_mean <- mean(tot_steps$total_steps)
+tot_mean
+tot_med <- median(tot_steps$total_steps)
+tot_med
+```
+
+We observe almost the same values for the mean and median values when using this filled dataset. So filling the missing values seem to have basically no effect in this case.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
